@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+import args from 'args'
+
+import options from './cli-options'
+import { error } from './exceptions'
+import { readConfigFile } from './config'
+import {
+  processDir,
+  processFiles
+} from './runner'
+
+{ assign } = Object
+
+cwd = process.cwd()
+
+for elem option in options:
+  args.option(...option)
+
+flags = args.parse(process.argv)
+
+let config = flags
+if flags.config:
+  now config = assign({}, flags,
+    readConfigFile(flags.config, { find: true, cwd })
+  )
+
+if config.directory:
+  processDir({ config, cwd, sub: args.sub })
+else:
+  processFiles({ config, cwd, sub: args.sub })

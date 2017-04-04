@@ -1,0 +1,11 @@
+export stderr (message) ->
+  console.error(`lightscript :: ${message}`)
+
+export error (exception, recoverable) ->
+  if typeof exception == 'string':
+    stderr(exception)
+  else:
+    { code, message } = exception
+    stderr(`${code}\n  ${message}`)
+
+  if !recoverable: process.exit(1)

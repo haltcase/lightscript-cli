@@ -1,0 +1,68 @@
+import relative from 'require-relative'
+import requireFromString from 'require-from-string'
+import { resolve } from 'path'
+import { transform } from 'babel-core'
+import { realpathSync, readFileSync } from 'fs'
+
+import { error } from './exceptions'
+import { internalBabelOptions } from './constants'
+
+POSSIBLE_NAMES = [
+  'lightscript.config.lsc'
+  'lightscript.config.js'
+  'lightscript.config.json'
+]
+
+export findConfigFile (withPath, { cwd }) ->
+  let config = false
+
+  if withPath == true:
+    for elem name in POSSIBLE_NAMES:
+      try:
+        now config = relative.resolve(`./${name}`, cwd)
+        break
+      catch e:
+        continue
+  else:
+    try:
+      now config = realpathSync(resolve(cwd, withPath))
+    catch e:
+      if e.code == 'ENOENT':
+        error({
+          code: 'CONFIG_FILE_MISSING'
+          message: `could not resolve config file\n  ${e.message}`
+        })
+
+      error({
+        code: 'CONFIG_FILE_UNKNOWN'
+        message: `error resolving config file\n  ${e.message}`
+      })
+
+  config
+
+export readConfigFile (atPath, { find, cwd }) ->
+  if find: now atPath = findConfigFile(atPath, { cwd })
+
+  if !atPath:
+    nameList = POSSIBLE_NAMES.join(', ')
+    error({
+      code: 'CONFIG_FILE_EXHAUST'
+      message: `no possible config file was found (${nameList})`
+    })
+
+  if atPath.endsWith('.json'):
+    return JSON.parse(readFileSync(atPath))
+
+  options = atPath.endsWith('.lsc')
+    ? internalBabelOptions
+    : { presets: internalBabelOptions.presets, plugins: [] }
+
+  try:
+    raw = readFileSync(atPath)
+    object = requireFromString(transform(raw, options).code)
+    object?.default or object
+  catch e:
+    error({
+      code: 'CONFIG_FILE_TRANSFORM',
+      message: `error transforming config file\n  ${e.message}`
+    })

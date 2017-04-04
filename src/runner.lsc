@@ -1,0 +1,119 @@
+import mkdirp from 'mkdirp'
+import globby from 'globby'
+import { watch } from 'chokidar'
+import { transformFileSync } from 'babel-core'
+
+import {
+  join,
+  resolve,
+  relative,
+  dirname
+} from 'path'
+
+import {
+  statSync,
+  existsSync,
+  readdirSync,
+  writeFileSync
+} from 'fs'
+
+import { error } from './exceptions'
+import { internalBabelOptions } from './constants'
+
+export processDir ({ config, cwd, sub }) ->
+  files = sub
+    ~reduce((list, current) => {
+      let result = globby.sync(current)
+      if !result.length: now result = [current]
+      list.concat(result)
+    }, [])
+    ~uniq()
+    ~map(file =>
+      if !existsSync(file):
+        error({
+          code: 'SOURCE_SPEC_ERROR'
+          message: `${file} does not exist`
+        })
+
+      processFile(file, arguments[0])
+    )
+
+export processFiles ({ config, cwd, sub }) ->
+  console.log('Not supported yet. Use `--directory [dir]`')
+
+export writeFile (src, dest, context) ->
+  compiled = compileSource(src, context)
+  if !compiled: return false
+
+  targetPath = dest.replace(/\.(\w*?)$/, '') + '.js'
+
+  try:
+    mkdirp.sync(dirname(targetPath))
+    writeFileSync(targetPath, compiled.code)
+  catch e:
+    error(e)
+
+  console.log(`${src} -> ${relative(context.cwd, targetPath)}`)
+
+export compileSource (src, context) ->
+  try:
+    { presets, plugins } = context.config
+    options = clone(internalBabelOptions)
+
+    // still applies babel-preset-env ??
+    if presets == true: options.presets = []
+    if isArray(presets): options.presets = presets
+    if isArray(plugins): options.plugins.concat(plugins)
+
+    transformFileSync(src, options)
+  catch e:
+    error({
+      code: 'SOURCE_TRANSFORM_ERROR',
+      message: `error transforming source file\n  ${e.message}`
+    }, context.config.watch)
+
+processFile (src, context) ->
+  targetDir = resolve(context.cwd, context.config.directory)
+
+  if statSync(src).isDirectory():
+    readdirSync(src)~each(file =>
+      target = join(src, file)
+      if statSync(target).isDirectory():
+        return processFile(target, context)
+
+      outPath = target.startsWith(src)
+        ? removeTopDir(target)
+        : target
+
+      writeFile(
+        target,
+        join(targetDir, outPath),
+        context
+      )
+    )
+  else:
+    outFile = removeTopDir(src)
+    writeFile(src, join(targetDir, outFile), context)
+
+  if context.config.watch: watchFiles(src, context)
+
+watchFiles (atPath, context) ->
+  watcher = watch(atPath, {
+    persistent: true
+    ignoreInitial: true
+    awaitWriteFinish: {
+      stabilityThreshold: 50
+      pollInterval: 10
+    }
+  })
+
+  ['add', 'change']~each(type =>
+    watcher.on(type, file =>
+      try:
+        processFile(file, context)
+      catch e:
+        console.error(e.stack)
+    )
+  )
+
+removeTopDir (path) -> path.slice(path.indexOf('\\') + 1)

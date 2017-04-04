@@ -1,0 +1,19 @@
+import { resolve } from 'path'
+import { realpathSync } from 'fs'
+
+export internalRoot = resolve(realpathSync(__filename), '..', '..')
+export internalModulePath = resolve(internalRoot, 'node_modules')
+
+env = require(resolve(internalModulePath, 'babel-preset-env'))
+lightscript = require(resolve(internalModulePath, 'babel-plugin-lightscript'))
+
+export internalBabelOptions = {
+  presets: [
+    [require(resolve(internalModulePath, 'babel-preset-env')), {
+      targets: { node: true }
+    }]
+  ]
+  plugins: [
+    require(resolve(internalModulePath, 'babel-plugin-lightscript'))
+  ]
+}
