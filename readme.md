@@ -7,12 +7,19 @@ stands more as a prototype than as the final solution, and is incomplete._
 
 ## installation
 
+Currently you'll need to:
+
 ```console
-npm i -g lightscript-cli
+git clone https://github.com/citycide/lightscript-cli.git
+cd lightscript-cli
+npm run build
+npm link
 ```
 
 The `lightscript` command is then available from anywhere, as well as
 the shorter form `lsc`.
+
+Eventually any offically recommended LightScript CLI would be available on NPM.
 
 ## usage
 
