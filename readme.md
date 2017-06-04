@@ -25,10 +25,13 @@ Eventually any offically recommended LightScript CLI would be available on NPM.
 
 ```console
 # compile the entire `src` directory into `dist`
-lightscript src -d dist
+lightscript compile src --directory dist
 
 # add custom plugins
-lightscript src -d dist --plugins lodash
+lightscript compile src --directory dist --plugins partial-application
+
+# with various shorthand aliases:
+lsc c src -d dist --plugins partial-application
 ```
 
 ## see also
