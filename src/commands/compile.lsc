@@ -1,0 +1,137 @@
+import { statSync } from 'fs'
+import { resolve } from 'path'
+import { watch } from 'chokidar'
+import _ from 'babel-plugin-partial-application'
+
+import { chalk, y, w, b } from '../util'
+import { readConfigFile } from '../config'
+import { internalBabelOptions } from '../constants'
+import { transformFile, transformList } from './lib/compile'
+
+cwd = process.cwd()
+
+isFile (path) ->
+  try:
+    statSync(resolve(cwd, path)).isFile()
+  catch e:
+    console.log(e.message)
+
+processFile (target, file, options) ->
+  { input, output } = transformFile(target, file, options)
+  console.log(`${input} -> ${output}`)
+
+processDirectory (inputs, directory, options) ->
+  results = transformList(inputs, directory, options)
+
+  for elem { input, output } in results:
+    console.log(`${input} -> ${output}`)
+
+  results
+
+watchFiles (input, onChange) ->
+  watcher = watch(input, {
+    persistent: true
+    ignoreInitial: true
+    awaitWriteFinish: {
+      stabilityThreshold: 50
+      pollInterval: 10
+    }
+  })
+
+  ['add', 'change']~each(watcher.on(_, onChange))
+  console.log(w('\nLightScript is watching files for changes ...'))
+
+export command = 'compile [inputs..]'
+export aliases = ['c']
+export describe = 'Compile LightScript files to JavaScript.'
+
+export builder = yargs ->
+  yargs
+    .options({
+      file: {
+        alias: ['f']
+        description: 'Compile to a single output file'
+      }
+      directory: {
+        alias: ['d']
+        description:  'Compile all inputs to a directory'
+      }
+      watch: {
+        alias: ['w']
+        type: 'boolean'
+        default: false
+        description: 'Watch files for changes and re-compile'
+      }
+    })
+    .usage(`${y('Usage:')} ${w('$0')} compile [inputs..]`)
+    .example(
+      '$ $0 compile file.lsc -f file.js',
+      'compile an input file to an output file'
+    )
+    .example(
+      '$ $0 compile src -d dist',
+      'compile a directory of files to an output directory'
+    )
+    .example(
+      '$ $0 compile -c',
+      'look up a configuration file (ie. `lightscript.config.lsc`)'
+    )
+    .example(
+      '$ $0 compile -c build/lightscript.config.lsc',
+      'specify a path to a configuration file'
+    )
+    .epilogue(
+      'See the readme on GitHub for more info about compilation, ' +
+      'configuration file lookup, and more.\n\n' +
+      w('https://github.com/citycide/lightscript-cli#readme')
+    )
+    .help()
+
+export handler = argv ->
+  options = defaultsDeep(
+    argv,
+    { babel: internalBabelOptions },
+    argv.config ? readConfigFile(argv.config, { find: true, cwd }) : {},
+    { cwd }
+  )
+
+  { inputs, file, directory } = options
+
+  if !inputs.length:
+    console.log(
+      `\nYou must provide input files.\n\n` +
+      `${y('Usage:')} ${w(argv.$0)} compile [inputs..]\n\n` +
+      `${y('Example:')} ${w(argv.$0)} compile index.js\n\n` +
+      'You can also specify `inputs` and output `directory` or `file`\n' +
+      'in a configuration file, eg. `lightscript.config.lsc`.\n'
+    )
+    return
+
+  if !file and !directory:
+    console.log('You must provide one of `--file` or `--directory`')
+    return
+
+  if file and isFile(inputs[0]):
+    processFile(inputs, file, options)
+    
+    if options.watch:
+      watchFiles(inputs[0], file =>
+        try:
+          processFile(inputs, file, options)
+        catch e:
+          console.error(e.stack)
+      )
+
+    return
+
+  if directory:
+    results = processDirectory(inputs, directory, options)
+      
+    if options.watch:
+      watchFiles(inputs, file =>
+        try:
+          destination = results.find(_.input == file)
+          processFile(file, destination?.output, options)
+        catch e:
+          console.error(e.stack)
+      )

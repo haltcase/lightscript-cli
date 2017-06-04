@@ -1,0 +1,86 @@
+import {
+  basename,
+  dirname,
+  extname,
+  join,
+  sep,
+  relative,
+  resolve
+} from 'path'
+
+import {
+  existsSync,
+  readdirSync,
+  statSync,
+  writeFileSync
+} from 'fs'
+
+import globby from 'globby'
+import makeDir from 'make-dir'
+import { transformFileSync } from 'babel-core'
+
+replaceTopDirectory (input, replacement) ->
+  rest = input.slice(input.indexOf(sep) + 1)
+  join(replacement, rest)
+
+replaceExtension (input, replacement = '.js') ->
+  extension = extname(input)
+  input.slice(0, -extension.length) + replacement
+
+normalizeGlob (glob) ->
+  if globby.hasMagic(glob): return glob
+  if statSync(glob).isDirectory():
+    return glob + '/**/*'
+
+export transformFile (input, output, { cwd, babel }) ->
+  inputPath = resolve(cwd, input)
+  compiled = compileSource(inputPath, babel)
+
+  if !output or output == true:
+    now output = replaceExtension(basename(input))
+
+  outputPath = resolve(cwd, output)
+  outputToFile(outputPath, compiled)
+  { input, output }
+
+export outputToFile (atPath, content) ->
+  try:
+    writeFileSync(atPath, content, 'utf8')
+  catch e:
+    if e.code == 'ENOENT':
+      makeDir.sync(dirname(atPath))
+      outputToFile(atPath, content)
+    else:
+      throw e
+
+export compileSource (src, babelConfig) ->
+  try:
+    transformFileSync(src, babelConfig).code
+  catch e:
+    console.log(e.message)
+
+export writeCompiled (outputPath, code) ->
+  try:
+    writeFileSync(outputPath, code, 'utf8')
+  catch e:
+    console.log(e.message)
+
+export transformList (inputs, output, context) ->
+  expandToFiles(inputs, context)
+    ~map(file =>
+      outputFile = file
+        ~replaceExtension()
+        ~replaceTopDirectory(context.directory)
+      transformFile(file, outputFile, context)
+    )
+
+export expandToFiles (inputs, { cwd }) ->
+  inputs
+    ~reduce((list, current) => {
+      now current = normalizeGlob(current)
+      let result = globby.sync(current, { nodir: true })
+      if !result.length: now result = [current]
+      list.concat(result)
+    }, [])
+    ~uniq()
+    ~filter(existsSync(_))

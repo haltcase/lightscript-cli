@@ -51,14 +51,14 @@ export readConfigFile (atPath, { find, cwd }) ->
     })
 
   if atPath.endsWith('.json'):
-    return JSON.parse(readFileSync(atPath))
+    return JSON.parse(readFileSync(atPath, 'utf8'))
 
   options = atPath.endsWith('.lsc')
     ? internalBabelOptions
     : { presets: internalBabelOptions.presets, plugins: [] }
 
   try:
-    raw = readFileSync(atPath)
+    raw = readFileSync(atPath, 'utf8')
     object = requireFromString(transform(raw, options).code)
     object?.default or object
   catch e:

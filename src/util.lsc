@@ -1,0 +1,7 @@
+import c from 'chalk'
+
+export y = c.yellow
+export w = c.white
+export b = c.bold
+
+export chalk = c

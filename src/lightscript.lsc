@@ -1,31 +1,32 @@
 #!/usr/bin/env node
 
-import args from 'args'
+import { chalk, y, w, b } from './util'
+import yargs from 'yargs'
 
-import options from './cli-options'
 import { error } from './exceptions'
 import { readConfigFile } from './config'
-import {
-  processDir,
-  processFiles
-} from './runner'
 
-{ assign } = Object
+import pkg from '../package.json'
 
 cwd = process.cwd()
 
-for elem option in options:
-  args.option(...option)
+{ argv } = yargs
+  .usage(`${y('Usage:')} ${w('$0')} [command] [options]`)
+  .version(pkg.version).alias('v', 'version')
+  .help().alias(['h'], 'help')
+  .updateStrings({
+    'Commands:': y('Commands:')
+    'Examples:': y('Examples:')
+    'Options:': y('Options:')
+    'Did you mean %s?': w(`  Did you mean ${b('%s')}?\n`)
+  })
+  .option('config', {
+    alias: 'c'
+    global: true
+    description: 'Use configuration file (boolean or path)'
+    defaultDescription: 'false'
+  })
+  .commandDir('./commands')
+  .recommendCommands()
 
-flags = args.parse(process.argv)
-
-let config = flags
-if flags.config:
-  now config = assign({}, flags,
-    readConfigFile(flags.config, { find: true, cwd })
-  )
-
-if config.directory:
-  processDir({ config, cwd, sub: args.sub })
-else:
-  processFiles({ config, cwd, sub: args.sub })
+if !argv._.length: yargs.showHelp('log')

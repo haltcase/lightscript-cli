@@ -1,0 +1,35 @@
+import { chalk, y, w, b } from '../util'
+
+export command = 'init [name]'
+export aliases = ['i']
+export describe = 'Create a new LightScript package'
+
+export builder = yargs ->
+  yargs
+    .options({
+      auto: {
+        type: 'boolean'
+        default: false
+        alias: ['a', 'y', 'yes', 'f', 'force']
+      }
+    })
+    .usage(`${y('Usage:')} ${w('$0')} init [name]`)
+    .example(
+      '$ $0 init',
+      'create a new package, inferring [name] from current directory'
+    )
+    .example(
+      '$ $0 init my-package-name',
+      'create a new package and directory called `my-package-name`'
+    )
+    .help()
+
+export handler = argv ->
+  if argv.name:
+    console.log('name provided')
+
+  if argv.auto:
+    console.log('skipping questions')
+    return
+
+  console.log('asking questions about init')

@@ -2,5 +2,8 @@
   "presets": [["env", {
     "targets": { "node": 4 }
   }]],
-  "plugins": ["lightscript"]
+  "plugins": [
+    "lightscript",
+    "babel-plugin-partial-application"
+  ]
 }
