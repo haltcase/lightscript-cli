@@ -62,6 +62,27 @@ export builder = yargs ->
         default: false
         description: 'Watch files for changes and re-compile'
       }
+      presets: {
+        alias: ['P']
+        type: 'array'
+        description: 'Additional Babel presets to apply'
+      }
+      plugins: {
+        alias: ['p']
+        type: 'array'
+        description: 'Additional Babel plugins to apply'
+      }
+      envPreset: {
+        type: 'boolean'
+        default: true
+        description: 'Whether `babel-preset-env` should be applied',
+      }
+      babelrc: {
+        alias: ['n']
+        type: 'boolean'
+        default: true
+        description: 'Whether to use existing babel configuration file'
+      }
     })
     .usage(`${y('Usage:')} ${w('$0')} compile [inputs..]`)
     .example(

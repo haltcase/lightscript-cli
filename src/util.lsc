@@ -12,13 +12,17 @@ export b = c.bold
 export chalk = c
 
 export mergeOptions = (argv, ...additionals) ->
-  merger = (obj, src) -> if obj~isArray(): obj.concat(src)
-
   { presets = [], plugins = [] } = argv
 
+  internals = argv.envPreset
+    ? internalBabelOptions
+    : internalBabelOptions~pick('plugins')
+
+  merger = (obj, src) -> if obj~isArray(): obj.concat(src)
+
   babel = mergeWith(
-    internalBabelOptions,
-    { plugins, presets },
+    internals,
+    { presets, plugins, babelrc: argv.babelrc },
     merger
   )
 
