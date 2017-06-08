@@ -106,7 +106,7 @@ export handler = argv ->
     return
 
   if file and isFile(inputs[0]):
-    processFile(inputs, file, options)
+    processFile(inputs[0], file, options)
 
     if options.watch:
       watchFiles(inputs[0], file =>
