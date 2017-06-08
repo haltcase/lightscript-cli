@@ -1,9 +1,9 @@
-# lightscript-cli &middot; [![LightScript](https://img.shields.io/badge/written%20in-lightscript-00a99d.svg)](http://www.lightscript.org)
+# lightscript-cli &middot; [![Version](https://img.shields.io/npm/v/lighscript-cli.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/lightscript-cli) [![License](https://img.shields.io/npm/l/lightscript-cli.svg?style=flat-square&maxAge=3600)](https://www.npmjs.com/package/lightscript-cli) [![LightScript](https://img.shields.io/badge/written%20in-lightscript-00a99d.svg)](http://www.lightscript.org)
 
-> CLI utility for creating & managing LightScript packages.
+> command line utility for working with LightScript code & packages
 
-_note: this project is a currently not the official lightscript-cli,
-stands more as a prototype than as the final solution, and is incomplete._
+_note: this project is a work in progress and, while usable, is
+not considered entirely stable_
 
 ## installation
 
