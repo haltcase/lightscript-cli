@@ -1,9 +1,6 @@
 // input needed for this command:
 // https://github.com/citycide/lightscript-cli/issues/1
 
-import { resolve } from 'path'
-import { existsSync } from 'fs'
-
 import { chalk, y, w, b } from '../util'
 
 cwd = process.cwd()
@@ -14,26 +11,12 @@ export describe = 'Create a new LightScript package'
 
 export builder = yargs ->
   yargs
-    .options({
-      auto: {
-        type: 'boolean'
-        default: false
-        alias: ['a', 'y', 'yes', 'f', 'force']
-      }
-    })
-    .usage(`${y('Usage:')} ${w('$0')} init [name]`)
-    .example(
-      '$ $0 init',
-      'create a new package, inferring [name] from current directory'
-    )
-    .example(
-      '$ $0 init my-package-name',
-      'create a new package and directory called `my-package-name`'
-    )
+    .usage(`${y('Usage:')} ${w('$0')} init`)
     .help()
 
 export handler = argv ->
-  pkgPath = resolve(cwd, 'package.json')
-
-  if existsSync(pkgPath):
-    return
+  console.log(
+    '\n  `init` is currently non-functional. Please provide any input\n' +
+    `  on what a ${b('`lightscript init`')} command should do here:\n\n` +
+    `  ${b('https://github.com/citycide/lightscript-cli/issues/1\n')}`
+  )
