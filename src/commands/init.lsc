@@ -1,4 +1,5 @@
-// what should this even do? is it even necessary?
+// input needed for this command:
+// https://github.com/citycide/lightscript-cli/issues/1
 
 import { resolve } from 'path'
 import { existsSync } from 'fs'

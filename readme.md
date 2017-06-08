@@ -7,7 +7,80 @@ stands more as a prototype than as the final solution, and is incomplete._
 
 ## installation
 
-Currently you'll need to:
+```console
+$ npm i -g lightscript-cli
+```
+
+The `lightscript` command is then available from anywhere, as well as
+the shorter form `lsc`.
+
+## usage
+
+### compile
+
+> compile LightScript source files to JavaScript.
+
+```console
+# compile an input file to an output file
+$ lsc compile file.lsc -f file.js
+
+# compile a directory of files to an output directory
+$ lsc compile src -d dist
+
+# look up a configuration file (ie. `lightscript.config.lsc`)
+$ lsc compile -c
+
+# specify a path to a configuration file
+$ lsc compile -c build/lightscript.config.lsc
+```
+
+> **Aliases**: `c`
+
+### eval
+
+> run LightScript code or files containing LightScript code (similar to `node -e <code | file>`)
+
+```console
+# evaluate the given code and output the result
+$ lsc eval "f = (x, y) -> x + y; f(1, 2)"
+
+# run the given file and output the result
+$ lsc eval build.js
+
+# same as above, using the `run` alias
+$ lsc run build.js
+```
+
+> **Aliases**: `run`, `e`
+
+### init
+
+> kickstart a LightScript package
+
+This command currently has no function - input is needed as to how it
+should work and what it should do under various circumstances.
+
+See [this issue](https://github.com/citycide/lightscript-cli/issues/1) to
+join the discussion.
+
+### repl
+
+> start an interactive REPL for evaluating LightScript code (similar to the `node` command)
+
+```console
+$ lsc repl
+
+> fn = (x, y) -> x + y
+'use strict'
+> fn(1, 2)
+3
+```
+
+## see also
+
+- [LightScript](http://www.lightscript.org) - the compile-to-JS language this tool is written in and for, leveraging [Babel](https://babeljs.io)
+
+## development
 
 ```console
 git clone https://github.com/citycide/lightscript-cli.git
@@ -16,27 +89,7 @@ npm run build
 npm link
 ```
 
-The `lightscript` command is then available from anywhere, as well as
-the shorter form `lsc`.
-
-Eventually any offically recommended LightScript CLI would be available on NPM.
-
-## usage
-
-```console
-# compile the entire `src` directory into `dist`
-lightscript compile src --directory dist
-
-# add custom plugins
-lightscript compile src --directory dist --plugins partial-application
-
-# with various shorthand aliases:
-lsc c src -d dist --plugins partial-application
-```
-
-## see also
-
-- [LightScript](http://www.lightscript.org) - the compile-to-JS language this tool is written in and for, leveraging [Babel](https://babeljs.io)
+This will make your local development copy available globally.
 
 ## contributing
 
