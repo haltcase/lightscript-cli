@@ -1,7 +1,22 @@
 import c from 'chalk'
 
+import { readConfigFile } from './config'
+import { internalBabelOptions } from './constants'
+
+cwd = process.cwd()
+
 export y = c.yellow
 export w = c.white
 export b = c.bold
 
 export chalk = c
+
+export mergeOptions = (argv, ...additionals) ->
+  mergeWith(
+    argv,
+    { babel: internalBabelOptions },
+    argv.config ? readConfigFile(argv.config, { find: true, cwd }) : {},
+    { cwd },
+    ...additionals,
+    (obj, src) -> if obj~isArray(): obj.concat(src)
+  )

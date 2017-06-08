@@ -1,4 +1,11 @@
+// what should this even do? is it even necessary?
+
+import { resolve } from 'path'
+import { existsSync } from 'fs'
+
 import { chalk, y, w, b } from '../util'
+
+cwd = process.cwd()
 
 export command = 'init [name]'
 export aliases = ['i']
@@ -25,11 +32,8 @@ export builder = yargs ->
     .help()
 
 export handler = argv ->
-  if argv.name:
-    console.log('name provided')
+  pkgPath = resolve(cwd, 'package.json')
 
-  if argv.auto:
-    console.log('skipping questions')
+  if existsSync(pkgPath):
     return
 
-  console.log('asking questions about init')

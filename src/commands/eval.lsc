@@ -1,0 +1,57 @@
+import register from 'babel-register'
+import { inspect } from 'util'
+import { existsSync } from 'fs'
+import { transform } from 'babel-core'
+import { basename, resolve } from 'path'
+import { runInContext, runInThisContext } from 'vm'
+
+import { readConfigFile } from '../config'
+import { internalBabelOptions } from '../constants'
+import { transformFile } from './lib/compile'
+import { chalk, y, w, b, mergeOptions } from '../util'
+
+cwd = process.cwd()
+
+export command = 'eval <code | file>'
+export aliases = ['e', 'run']
+export describe = 'Run LightScript code or files containing LightScript code'
+
+export builder = yargs ->
+  yargs
+    .usage(`${y('Usage:')} ${w('$0')} eval <code | file>`)
+    .example(
+      '$ $0 eval "f = (x, y) -> x + y; f(1, 2)"'
+      'evaluate the given code and output the result'
+    )
+    .example(
+      '$ $0 eval build.js'
+      'run the given file and output the result'
+    )
+    .example(
+      '$ $0 run build.js'
+      'same as above, using the `run` alias'
+    )
+    .help()
+
+export handler = argv ->
+  options = mergeOptions(argv)
+
+  if existsSync(argv.file):
+    if !options.compileAllFiles:
+      options.babel.extensions = ['.lsc']
+
+    target = resolve(argv.file)
+    console.log(runInContext(`
+      console.log(options.babel)
+      require('babel-register')(options.babel)
+      require(target)
+    `, { options, target }, basename(target)))
+    return
+
+  try:
+    transform(argv.code, options.babel).code
+      ~runInThisContext('LIGHTSCRIPT_EVAL')
+      ~inspect({ colors: true })
+      ~console.log()
+  catch e:
+    console.log(e.message)

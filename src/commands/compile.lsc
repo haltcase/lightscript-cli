@@ -3,10 +3,10 @@ import { resolve } from 'path'
 import { watch } from 'chokidar'
 import _ from 'babel-plugin-partial-application'
 
-import { chalk, y, w, b } from '../util'
 import { readConfigFile } from '../config'
 import { internalBabelOptions } from '../constants'
 import { transformFile, transformList } from './lib/compile'
+import { chalk, y, w, b, mergeOptions } from '../util'
 
 cwd = process.cwd()
 
@@ -88,13 +88,7 @@ export builder = yargs ->
     .help()
 
 export handler = argv ->
-  options = defaultsDeep(
-    argv,
-    { babel: internalBabelOptions },
-    argv.config ? readConfigFile(argv.config, { find: true, cwd }) : {},
-    { cwd }
-  )
-
+  options = mergeOptions(argv)
   { inputs, file, directory } = options
 
   if !inputs.length:

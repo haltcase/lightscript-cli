@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { chalk, y, w, b } from './util'
 import yargs from 'yargs'
 
 import { error } from './exceptions'
 import { readConfigFile } from './config'
+import { chalk, y, w, b } from './util'
 
 import pkg from '../package.json'
 
@@ -28,5 +28,6 @@ cwd = process.cwd()
   })
   .commandDir('./commands')
   .recommendCommands()
+  .wrap(yargs.terminalWidth())
 
 if !argv._.length: yargs.showHelp('log')

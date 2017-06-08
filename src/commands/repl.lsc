@@ -1,0 +1,27 @@
+import repl from 'repl'
+import { transform } from 'babel-core'
+
+import { readConfigFile } from '../config'
+import { internalBabelOptions } from '../constants'
+import { chalk, y, w, b, mergeOptions } from '../util'
+
+createProcessor = (instance, options) ->
+  original = instance.eval
+
+  (source, context, filename, callback) ->
+    { code } = transform(source, options.babel)
+    original(code, context, filename, callback)
+
+export command = 'repl'
+export aliases = ['r']
+export describe = 'Start an interactive LightScript REPL'
+
+export builder = yargs ->
+  yargs
+    .usage(`${y('Usage:')} ${w('$0')} repl`)
+    .help()
+  
+export handler = argv ->
+  options = mergeOptions(argv)
+  instance = repl.start({ prompt: '> ' })
+  instance.eval = createProcessor(instance, options)
