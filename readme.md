@@ -27,6 +27,16 @@ $ lsc compile file.lsc -f file.js
 # compile a directory of files to an output directory
 $ lsc compile src -d dist
 
+# use additional Babel presets or plugins
+$ lsc compile src -d dist --presets react --plugins partial-application
+
+# do not use existing .babelrc file
+$ lsc compile src -d dist --no-babelrc
+$ lsc compile src -d dist -n
+
+# do not apply `babel-preset-env`
+$ lsc compile src -d dist --no-env-preset
+
 # look up a configuration file (ie. `lightscript.config.lsc`)
 $ lsc compile -c
 
@@ -35,6 +45,16 @@ $ lsc compile -c build/lightscript.config.lsc
 ```
 
 > **Aliases**: `c`
+
+Note that, by default, `lightscript-cli` will use Babel's usual
+`.babelrc` lookup behavior, and merge this with its internally
+provided configuration. This means that if there is a `.babelrc`
+file present, those presets & plugins will be added after the
+relevant `lightscript` plugins. You can use the
+`--no-babelrc` / `-n` flag to disable this.
+
+`babel-preset-env` is also applied by default, but can be disabled
+using the `--no-env-preset` flag.
 
 ### eval
 
@@ -74,6 +94,53 @@ $ lsc repl
 'use strict'
 > fn(1, 2)
 3
+```
+
+> **Aliases**: `r`
+
+## configuration file
+
+Similar to webpack, you can create a config file for a more clear,
+reusable, & dynamic way to apply options. When passed the
+`--config` / `-c` flag without a parameter, `lightscript-cli` will
+search for a config file within the current working directory in
+the following order:
+
+1. `lightscript.config.lsc`
+2. `lightscript.config.js`
+3. `lightscript.config.json`
+
+Obviously, `lightscript.config.lsc` allows you to use LightScript
+syntax to define your configuration. For example:
+
+```coffeescript
+comments = process.env.NODE_ENV == 'development'
+
+export default {
+  inputs: ['src/**/*', '!src/*.spec.lsc']
+  directory: ['dist']
+
+  envPreset: false
+
+  babel: {
+    babelrc: false
+    comments
+    plugins
+  }
+}
+```
+
+The above configuration allows you to run only `lsc compile -c`. The CLI
+would locate this file and compile the `inputs` into `directory` while
+not using `babel-preset-env` or any existing `.babelrc`.
+
+It also shows a tiny example of dynamic configuration by deciding
+whether or not to output comments based on environment.
+
+You can also specify a config file by passing a parameter with the flag:
+
+```console
+$ lsc compile -c build/compile-config.lsc
 ```
 
 ## see also
