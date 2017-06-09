@@ -1,6 +1,6 @@
 {
   "name": "lightscript-cli",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "CLI utility for creating & managing LightScript packages.",
   "license": "MIT",
   "author": {
