@@ -1,12 +1,26 @@
 #!/usr/bin/env node
 
 import yargs from 'yargs'
+import updater from 'update-notifier'
 
 import { error } from './exceptions'
 import { readConfigFile } from './config'
 import { chalk, y, w, b } from './util'
 
 import pkg from '../package.json'
+
+notifier = updater({ pkg })
+
+notifier.notify({
+  defer: true
+  boxenOpts: {
+		margin: 1
+		padding: 1
+		align: 'center'
+		borderColor: 'yellow'
+		borderStyle: 'single'
+  }
+})
 
 cwd = process.cwd()
 
