@@ -32,7 +32,6 @@ $ lsc compile src -d dist --presets react --plugins partial-application
 
 # do not use existing .babelrc file
 $ lsc compile src -d dist --no-babelrc
-$ lsc compile src -d dist -n
 
 # do not apply `babel-preset-env`
 $ lsc compile src -d dist --no-env-preset
@@ -51,7 +50,7 @@ Note that, by default, `lightscript-cli` will use Babel's usual
 provided configuration. This means that if there is a `.babelrc`
 file present, those presets & plugins will be added after the
 relevant `lightscript` plugins. You can use the
-`--no-babelrc` / `-n` flag to disable this.
+`--no-babelrc` flag to disable this.
 
 `babel-preset-env` is also applied by default, but can be disabled
 using the `--no-env-preset` flag.

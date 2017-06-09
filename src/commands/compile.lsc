@@ -78,7 +78,6 @@ export builder = yargs ->
         description: 'Whether `babel-preset-env` should be applied',
       }
       babelrc: {
-        alias: ['n']
         type: 'boolean'
         default: true
         description: 'Whether to use existing babel configuration file'
