@@ -14,11 +14,11 @@ notifier = updater({ pkg })
 notifier.notify({
   defer: true
   boxenOpts: {
-		margin: 1
-		padding: 1
-		align: 'center'
-		borderColor: 'yellow'
-		borderStyle: 'single'
+    margin: 1
+    padding: 1
+    align: 'center'
+    borderColor: 'yellow'
+    borderStyle: 'single'
   }
 })
 
