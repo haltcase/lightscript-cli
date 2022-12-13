@@ -2,8 +2,7 @@
 
 > command line utility for working with LightScript code & packages
 
-_note: this project is a work in progress and, while usable, is
-not considered entirely stable_
+_note: this project is no longer actively developed and its use is not recommended._
 
 ## installation
 
@@ -79,7 +78,7 @@ $ lsc run build.js
 This command currently has no function - input is needed as to how it
 should work and what it should do under various circumstances.
 
-See [this issue](https://github.com/citycide/lightscript-cli/issues/1) to
+See [this issue](https://github.com/haltcase/lightscript-cli/issues/1) to
 join the discussion.
 
 ### repl
@@ -149,7 +148,7 @@ $ lsc compile -c build/compile-config.lsc
 ## development
 
 ```console
-git clone https://github.com/citycide/lightscript-cli.git
+git clone https://github.com/haltcase/lightscript-cli.git
 cd lightscript-cli
 npm run build
 npm link
@@ -159,7 +158,7 @@ This will make your local development copy available globally.
 
 ## contributing
 
-Pull requests and any [issues](https://github.com/citycide/lightscript-cli/issues)
+Pull requests and any [issues](https://github.com/haltcase/lightscript-cli/issues)
 found are always welcome.
 
 1. Fork the project, and preferably create a branch named something like `feat-make-better`
@@ -169,4 +168,4 @@ found are always welcome.
 
 ## license
 
-MIT © [Bo Lingen / citycide](https://github.com/citycide)
+MIT © [Bo Lingen / haltcase](https://github.com/haltcase)
